@@ -21,4 +21,4 @@ bspc config -m DP-4 top_padding 30
 bspc config -m DP-2 top_padding 30
 bspc config -m DP-0 top_padding 30
 
-autostart.sh &
+~/.config/bspwm/autostart.sh &

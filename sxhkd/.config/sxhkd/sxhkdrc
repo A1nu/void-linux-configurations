@@ -24,15 +24,25 @@ super + Up
 super + Right
     bspc node -f east
 
-# Swap window in direction (arrow keys + Alt)
-super + alt + Left
+# Swap (поменять местами с соседним окном)
+super + shift + Left
     bspc node -s west
-super + alt + Down
+super + shift + Down
     bspc node -s south
-super + alt + Up
+super + shift + Up
     bspc node -s north
-super + alt + Right
+super + shift + Right
     bspc node -s east
+
+# Move (переместить окно внутрь в заданном направлении)
+super + alt + Left
+    bspc node -n west
+super + alt + Down
+    bspc node -n south
+super + alt + Up
+    bspc node -n north
+super + alt + Right
+    bspc node -n east
 
 # Switch to desktops 1–9
 super + 1

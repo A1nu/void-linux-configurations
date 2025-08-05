@@ -21,3 +21,4 @@ done &
 PATH=$PATH:~/.local/bin
 
 start-1password.sh &
+
