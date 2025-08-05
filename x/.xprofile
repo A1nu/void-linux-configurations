@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Start D-Bus session if not running
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+    eval "$(dbus-launch --sh-syntax --exit-with-session)"
+fi
+
+# Set US and RU layouts with Alt+Shift toggle
+setxkbmap -layout "us,ru" -option "grp:alt_shift_toggle"
+
+# Enable visual indicator for layout
+xsetroot -name "$(setxkbmap -query | awk '/layout:/ {print toupper($2)}')"
+
+# Background layout switcher (updates root window name)
+while true; do
+  current=$(setxkbmap -query | awk '/layout:/ {print $2}')
+  xsetroot -name "$(echo $current | tr '[:lower:]' '[:upper:]')"
+  sleep 1
+done &
+
+PATH=$PATH:~/.local/bin
+
+~/.config/bspwm/start-1password.sh &

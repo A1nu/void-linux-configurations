@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Конфиг по умолчанию или из окружения
+TMUX_CONF="${TMUX_CONF:-$HOME/.config/tmux/tmux.conf}"
+TMUX_CMD="tmux -f $TMUX_CONF"
+TERM_CMD="alacritty"
+
+SESSION_NAME=""
+FORCE_NEW=false
+
+# Аргументы
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -s|--session)
+      SESSION_NAME="$2"
+      shift 2
+      ;;
+    --new|--unique)
+      FORCE_NEW=true
+      shift
+      ;;
+    *)
+      echo "Usage: tmuxterm [-s <name>] [--new]"
+      exit 1
+      ;;
+  esac
+done
+
+# Если сессия не указана — найдём detached или создадим уникальную
+if [[ -z "$SESSION_NAME" ]]; then
+  # Если не форсирован новый — пробуем найти detached
+  if ! $FORCE_NEW; then
+    SESSION_NAME=$($TMUX_CMD list-sessions 2>/dev/null | awk '/(detached)/ {print $1}' | sed 's/:$//' | head -n1)
+  fi
+
+  # Если не нашли — создаём уникальное имя
+  if [[ -z "$SESSION_NAME" ]]; then
+    i=1
+    while $TMUX_CMD has-session -t "session_$i" 2>/dev/null; do
+      ((i++))
+    done
+    SESSION_NAME="session_$i"
+  fi
+fi
+
+# Создаём, если не существует
+if ! $TMUX_CMD has-session -t "$SESSION_NAME" 2>/dev/null; then
+  $TMUX_CMD new-session -d -s "$SESSION_NAME"
+fi
+
+# Запускаем alacritty и подключаемся к tmux
+nohup "$TERM_CMD" -e $TMUX_CMD attach -t "$SESSION_NAME" > /dev/null 2>&1 &
+

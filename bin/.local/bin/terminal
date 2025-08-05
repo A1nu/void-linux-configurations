@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export ALACRITTY_CONFIG_FILEE="$HOME/.config/alacritty/alacritty.toml"
+
+alacritty msg create-window "$@" || alacritty "$@"
+
