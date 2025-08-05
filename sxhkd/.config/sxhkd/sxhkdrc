@@ -130,10 +130,10 @@ super + alt + l
 
 # sound togle
 super + l
-    .local/bin/toggle-audio.sh
+    toggle-audio.sh
 
 super + shift + s
-    ~/.local/bin/snip-to-clipboard.sh
+    snip-to-clipboard.sh
 
 # Volume up
 XF86AudioRaiseVolume

@@ -13,7 +13,7 @@ wireplumber &
 # Горячие клавиши, Polybar, обои
 sxhkd &
 ~/.config/polybar/launch.sh &
-~/.config/bspwm/wallpaper.sh &
+wallpaper.sh &
 picom &
 # Bluetooth апплет
 blueman-applet &
@@ -36,5 +36,5 @@ pw-jack easyeffects --gapplication-service &
 pgrep -x 1password > /dev/null || /opt/1Password/1password --silent --start-agent &
 
 # Проверка обновлений (твоя логика)
-~/.config/autostart/check-nvidia-updates.sh &
+check-nvidia-updates.sh &
 
