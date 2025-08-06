@@ -63,25 +63,34 @@ export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:/usr/local/share:/usr/share
 PATH=$PATH:~/.local/bin
 
 # --- Auto-attach or create tmux session uniquely ---
-if command -v tmux >/dev/null && [ -z "$TMUX" ] && [ -n "$TERM" ] && [ -z "$INSIDE_TMUX_AUTO" ]; then
-  export INSIDE_TMUX_AUTO=1
-
-  # Сначала ищем существующую session_N без флага attached
-  SESSION=$(tmux list-sessions 2>/dev/null | awk '!/\(attached\)$/ && $1 ~ /^session_[0-9]+:/ { gsub(":", "", $1); print $1; exit }')
-
-  # Если не нашли — создаём новую уникальную session
-  if [[ -z "$SESSION" ]]; then
-    i=1
-    while tmux has-session -t "session_$i" 2>/dev/null; do
-      ((i++))
-    done
-    SESSION="session_$i"
-    tmux new-session -d -s "$SESSION"
-  fi
-
-  exec tmux attach -t "$SESSION"
-fi
+# if command -v tmux >/dev/null && [ -z "$TMUX" ] && [ -n "$TERM" ] && [ -z "$INSIDE_TMUX_AUTO" ]; then
+#   export INSIDE_TMUX_AUTO=1
+#
+#   # Сначала ищем существующую session_N без флага attached
+#   SESSION=$(tmux list-sessions 2>/dev/null | awk '!/\(attached\)$/ && $1 ~ /^session_[0-9]+:/ { gsub(":", "", $1); print $1; exit }')
+#
+#   # Если не нашли — создаём новую уникальную session
+#   if [[ -z "$SESSION" ]]; then
+#     i=1
+#     while tmux has-session -t "session_$i" 2>/dev/null; do
+#       ((i++))
+#     done
+#     SESSION="session_$i"
+#     tmux new-session -d -s "$SESSION"
+#   fi
+#
+#   exec tmux attach -t "$SESSION"
+# fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}

@@ -1,26 +1,39 @@
 #!/usr/bin/env bash
 
-# Названия устройств вывода (проверь через pactl list short sinks)
-HEADPHONES="alsa_output.usb-SteelSeries_SteelSeries_Arctis_Nova_5-00.analog-stereo"
-MONITOR="alsa_output.pci-0000_01_00.1.hdmi-stereo-extra2"
+# Ключевые слова для поиска
+HEADPHONES_KEY="SteelSeries"
+MONITOR_KEY="hdmi-stereo"
 
-# Получаем активное устройство
-CURRENT=$(pactl get-default-sink)
+# Получаем имя текущего sink
+CURRENT_SINK=$(pactl get-default-sink)
 
-# Логика переключения
-if [[ "$CURRENT" == "$HEADPHONES" ]]; then
-    NEW_SINK="$MONITOR"
-    echo "🔊 Переключаемся на монитор"
+echo "🎚️  Текущее устройство: $CURRENT_SINK"
+
+# Определяем целевой sink
+if echo "$CURRENT_SINK" | grep -qi "$HEADPHONES_KEY"; then
+    TARGET_KEY="$MONITOR_KEY"
+    echo "🔊 Переключаемся на монитор..."
 else
-    NEW_SINK="$HEADPHONES"
-    echo "🎧 Переключаемся на наушники"
+    TARGET_KEY="$HEADPHONES_KEY"
+    echo "🎧 Переключаемся на наушники..."
 fi
 
-# Устанавливаем новое устройство по умолчанию
+# Ищем новое устройство по ключу
+NEW_SINK=$(pactl list short sinks | grep -i "$TARGET_KEY" | awk '{print $2}' | head -n1)
+
+# Проверка на пустой результат
+if [[ -z "$NEW_SINK" ]]; then
+    echo "❌ Не найден sink с ключом: $TARGET_KEY"
+    exit 1
+fi
+
+# Переключаем устройство по умолчанию
 pactl set-default-sink "$NEW_SINK"
 
-# Переносим активные потоки (если есть)
+# Перемещаем активные потоки
 pactl list short sink-inputs | awk '{print $1}' | while read -r ID; do
-    pactl move-sink-input "$ID" "$NEW_SINK" 2>/dev/null
+    pactl move-sink-input "$ID" "$NEW_SINK"
 done
+
+echo "✅ Переключение завершено: $NEW_SINK"
 

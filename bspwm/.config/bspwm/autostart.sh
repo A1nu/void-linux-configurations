@@ -6,9 +6,9 @@ mkdir -p "$XDG_RUNTIME_DIR"
 chmod 700 "$XDG_RUNTIME_DIR"
 
 # PipeWire + Pulse bridge + session manager
-pipewire &
-pipewire-pulse &
-wireplumber &
+start-if-not-exist.sh pipewire
+start-if-not-exist.sh pipewire-pulse
+start-if-not-exist.sh wireplumber
 
 # Горячие клавиши, Polybar, обои
 sxhkd &
